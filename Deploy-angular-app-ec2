@@ -1,0 +1,111 @@
+1. # Launch the instance from the amazon ec2 console. While launching don't forget to save the '.pem' key file.
+
+2. # Update the security group of the newly created EC2 instance and add the HTTP port 80 of a protocol of TCP
+
+3. # Connect to the created instance using the following commands based on which works for you-
+    - ssh -i path/to/.pem/file ubuntu@PUBLIC_IPV4_ADDRESS
+    - ssh -i file_name.pem ubuntu@PUBLIC_IPV4_ADDRESS
+
+4. # Install 'nginx' server on the instance using the following commands- 
+    - sudo -s -> for super user
+    - sudo apt update -> to update the existing packages
+    - sudo apt install nginx -> to install the nginx web server
+
+    If you go to Public IPv4 address of the EC2 instance you will see some 'Welcome to Nginx!' screen, which means the NGINX web server
+    is successfully installed and ready to use.
+
+5. # Build the angular application locally in VS-Code editor using the following command or whatever works for you-
+    - ng build --configuration production -> For angular version 12 and above 
+    - ng build --prod -> For versions older than 11
+
+6. # Update the .gitignore file by removing the /dist from there. And push the code to gitHub.
+
+7. # Now clone the github repo to ec2 instance, but before that make sure if 'git' is installed there. if not use the
+   following commands to install it on the instance - 
+    - sudo apt update
+    - sudo apt install git
+   To verfiy if git is installed use the command - 'git --version'
+
+8. # Now move to the '/var/www/html' folder using the command - 'cd /var/www/html', and clone the repo there.
+
+While cloning the repo you might encounter the 'permission denied' error. So, to overcome that you need to 
+make use of ssh-key.
+    - ssh-keygen => to generate the ssh-key
+    - cat ~/.ssh/id_rsa => to see the private ssh-key in id_rsa file (private ssh-key needs to be added to bitbucket)
+
+NOTE- Some bonus commands
+    - sudo cp /home/ubuntu/.ssh/id_rsa /var/www/html/id_rsa_copy  => to copy the content of one file to another
+    - sudo mv /var/www/html/id_rsa_copy /var/www/html/id_rsa => to rename the file
+
+NOTE- When you try to clone the repo in /var/www/html, you might still encounter the following similar error - 
+        - "Could not create work tree dir 'example.com'.: Permission denied"
+        - Use this command- 'sudo chown -R $USER /var/www' to fix the above error
+
+NOTE- here are alternate ways, for ubuntu OS we can follow the SCP(secure copy) command to copy the angular build to the EC2 instance. 
+Please refer to the following command to copy the build using the SCP command.
+    - scp -r -i ./key-pair.pem ./path/to/files/ <username>@<public-ip-address>:/pathwhere/you/need/to/copy
+  following are the details of the mentioned copy command.
+    scp: IT is a network protocol used to securely copy files/folders between Linux systems on a network.
+    -r: To recursively copy all the folder content, subfolders and their data.
+    -i ./key-pair.pem: Specify the file from which to read the identity for public key authentication.
+    username: username of the ec2 instance
+    public-ip-address: public IP address of the EC2 instance
+
+9. # After the project build is available on the EC2 instance, we have to modify our NGINX configuration file so our 
+angular project is rendered there successfully. Open the configuration file using the following command
+    - sudo vim /etc/nginx/sites-enabled/default
+
+NOTE- enter 'i' to enter into to write mode.
+
+    - update to root field and provide path of the angular code build
+        - root /var/www/html/v2-tl-dashboard/dist/tl-dashboardv2/;
+    - update 'server_name' filed and provide the domain name 
+        - server_name app.upgrade.staging.talentlitmus.com; 
+    - Location block in this case is configured to serve a static page
+        location / {
+                try_files $uri $uri/ /index.html;
+        }
+
+    - The NGINX configuration file will look as follows
+        server {
+            listen 80 default_server;
+            listen [::]:80 default_server;      
+    
+            #provide the build path
+            root /var/www/html/v2-tl-dashboard/dist/tl-dashboardv2/;
+            index index.html index.htm index.nginx-debian.html;
+            server_name app.upgrade.staging.talentlitmus.com;
+            location / {
+                try_files $uri $uri/ /index.html;
+            }
+        }
+
+NOTE- In vim there are 3 different modes:
+
+    Insert - allows typing and editing as normal
+    Visual - used for selecting copy/paste etc.
+    Normal - used for commands
+    To get back to Normal mode, you can always press esc.
+
+Once you are at Normal mode Press : to begin your command (you'll see it appear in the bottom left). The following commands are related to quiting vim:
+
+    :q - quit if no changes were made
+    :q! - quit and destroy any changes made
+    :wq - write changes (save) and quit
+    :x - similar to :wq, only write the file if changes were made, then quit
+
+
+10. # After comming out of the vim mode, enter the following command to check the test status of Nginx conf- 
+    - sudo nginx -t
+
+11. # Restart NGINX using any of the two commands
+    - sudo nginx -s reload
+    - sudo service nginx restart
+
+NOTE- To check the status of nginx server use the command - 'sudo service nginx status'
+
+12. ## 8. Add SSL with LetsEncrypt
+    - sudo add-apt-repository ppa:certbot/certbot
+    - sudo apt-get update
+    - sudo apt-get install python3-certbot-nginx
+    - sudo certbot --nginx -d yourdomain.com 
