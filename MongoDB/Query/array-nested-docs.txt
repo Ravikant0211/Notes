@@ -1,0 +1,99 @@
+# Understanding query specification on embedded docs inside an array
+
+db.collection('inventory').insertMany([
+  {
+    item: 'journal',
+    instock: [
+      { warehouse: 'A', qty: 5 },
+      { warehouse: 'C', qty: 15 }
+    ]
+  },
+  {
+    item: 'notebook',
+    instock: [{ warehouse: 'C', qty: 5 }]
+  },
+  {
+    item: 'paper',
+    instock: [
+      { warehouse: 'A', qty: 60 },
+      { warehouse: 'B', qty: 15 }
+    ]
+  },
+  {
+    item: 'planner',
+    instock: [
+      { warehouse: 'A', qty: 40 },
+      { warehouse: 'B', qty: 5 }
+    ]
+  },
+  {
+    item: 'postcard',
+    instock: [
+      { warehouse: 'B', qty: 15 },
+      { warehouse: 'C', qty: 35 }
+    ]
+  }
+]);
+
+
+1. This selects all the documents, where any of the nested docs
+inside instock array contains 'qty' as less or equal to 20.
+db.collection('inventory').find({
+  'instock.qty': { $lte: 20 }
+});
+
+2. This matches all the documents, where the first docs nested
+inside instock array contains 'qty' as less or equal to 20.
+db.collection('inventory').find({
+  'instock.0.qty': { $lte: 20 }
+});
+
+3. This matches all documents where the instock array has at least one
+embedded document that contains the field qty equal to 5 and at least
+one embedded document (but not necessarily the same embedded document)
+that contains the field warehouse equal to A
+db.collection('inventory').find({
+  'instock.qty': 5,
+  'instock.warehouse': 'A'
+});
+
+OUTPUT: 
+[
+    {
+        item: 'journal',
+        instock: [
+            { warehouse: 'A', qty: 5 },
+            { warehouse: 'C', qty: 15 }
+        ]
+    },
+    {
+        item: 'planner',
+        instock: [
+            { warehouse: 'A', qty: 40 },
+            { warehouse: 'B', qty: 5 }
+        ]
+    },
+]
+
+4. This matches all the documents where the instock array has 
+at least one embedded document that contains both the field 
+qty equal to 5 and the field warehouse equal to A.
+db.collection('inventory').find({
+    instock: { 
+        $elemMatch: {
+            qty: 5,
+            warehouse: 'A'
+        }
+    }
+});
+
+OUTPUT: 
+[
+    {
+        item: 'journal',
+        instock: [
+            { warehouse: 'A', qty: 5 },
+            { warehouse: 'C', qty: 15 }
+        ]
+    }
+]

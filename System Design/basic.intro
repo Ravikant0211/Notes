@@ -1,0 +1,80 @@
+# What is system desing?
+System design is the process of defining the architecture, components, interfaces and data for a system to satisfy
+specified requirements. It involves translating user requirements into a detailed blueprint that guides the 
+implementation phase. The goal is to create a well-organised and efficient structure that meets the intended purpose
+while considering factors like scalability, maintainability, and performance.
+
+
+# System Design lifecycle- 
+- Planning
+- Feasibility Study
+- System Design
+- Implementation
+- Testing
+- Deployment
+- Maintenance and Support
+
+
+# System architecture-
+It is basically the skeleton design of a software system depicting components, abstraction levels, 
+and other aspects of a software system
+
+# System Architecture Patterns-
+- Layered Pattern
+- Client-Server Pattern
+- Event-Driven Pattern
+- MicroKernel Pattern
+- Microservice Pattern
+
+
+# Key concepts and terminologies
+ - Throughput
+ - Latency
+ - Availability
+ - Redundancy
+ - Time 
+ - CAP Theorem
+
+# Throughput
+Measure of amount of data transmitted successfully in a system.
+How much data is transmitted successfully over a period of time.
+Unit- bits per second (bps)
+
+# Latency
+The amount of time required for a single data to be delivered successfully.
+Delay between user input and web application response to the same input is know as latency.
+Unit- miliseconds (ms).
+
+Reasons for high Latency-
+1. Network Delay
+2. Mathematical calculations Process Delay
+
+In 'monolithic architecture', Latency = Mathematical calculation Delays
+In 'Distributed System', Latency = Mathematical calculation Delay + Network Delay
+
+
+# Availability 
+Availability is the percentage of time the system is up and working for the needs.
+
+How to increase Availability ?
+1. Eliminate SPOF.
+2. Verify automatic failovers
+3. Use Geographich Redundancy
+4. Continue upgrading and improving 
+
+
+# Redundancy 
+Redundancy in system design is a concept where certain entities are duplicated with aim to scale up the
+system and reduce the over all down-time.
+
+
+# Load Balancer
+A load balancer works as a “traffic cop” sitting in front of your server and routing client requests
+across all servers. It simply distributes the set of requested operations (database write requests, 
+cache queries) effectively across multiple servers and ensures that no single server bears too many 
+requests that lead to degrading the overall performance of the application. A load balancer can be a 
+physical device or a virtualized instance running on specialized hardware or a software process.
+
+
+# Consistency 
+Consistency is referred to as data uniformity in systems. 

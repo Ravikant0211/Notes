@@ -1,0 +1,80 @@
+# Understanding array specific query- 
+
+db.collection('inventory').insertMany([
+  {
+    item: 'journal',
+    qty: 25,
+    tags: ['blank', 'red'],
+    dim_cm: [14, 21]
+  },
+  {
+    item: 'notebook',
+    qty: 50,
+    tags: ['red', 'blank'],
+    dim_cm: [14, 21]
+  },
+  {
+    item: 'paper',
+    qty: 100,
+    tags: ['red', 'blank', 'plain'],
+    dim_cm: [14, 21]
+  },
+  {
+    item: 'planner',
+    qty: 75,
+    tags: ['blank', 'red'],
+    dim_cm: [22.85, 30]
+  },
+  {
+    item: 'postcard',
+    qty: 45,
+    tags: ['blue'],
+    dim_cm: [10, 15.25]
+  }
+]);
+
+
+Examples: 
+---------
+1. This matches the documents where the field 'tags' values is 
+an array with exactly two elements, "red" and "blank", in the same order.
+db.collection('inventory).find({
+    tags: ['red', 'blank']
+})
+
+2. This matches all the documents, where 'tags' array contains "red" 
+as one of the elements.
+db.collection('inventory').find({
+    tags: 'red'
+})
+
+3. This matches the documents where the field 'tags' array contains
+both the elements, "red" and "blank", without regard to order or 
+other elements in the array.
+db.collection('inventory').find({
+    tags: { $all: [ 'red', 'blank' ] }
+})
+
+4. This matches the documents, where the field 'dim_cm' contains
+the atleast one element that is greater than 10 or lesser than 30 or both.
+db.collection('inventory').find({
+    dim_cm: { $gt: 10, $lt: 30 }
+}) 
+
+5. This matches the documents, where the field 'dim_cm' contains
+at least one element that is both greater than 10 and lesser than 30.
+db.collection('inventory').find({
+    dim_cm: { $elemMatch: { $gt: 10, $lt: 30 } }
+})
+
+6. This matches all documents where the second element in the array 
+dim_cm is greater than 25:
+db.collection('inventory').find({
+    "dim_cm.1": { $gt: 25 }
+})
+
+
+7. This matches all documents where the array tags has 3 elements.
+db.collection('inventory').find({
+    tags: { $size: 3 }
+})

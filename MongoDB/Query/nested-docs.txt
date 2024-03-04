@@ -1,0 +1,57 @@
+# to specify a query condition inside a nested/embedded document, we use 
+'dot notation' 
+
+Example:
+--------
+db.collection('inventory').insertMany([
+  {
+    item: 'journal',
+    qty: 25,
+    size: { h: 14, w: 21, uom: 'cm' },
+    status: 'A'
+  },
+  {
+    item: 'notebook',
+    qty: 50,
+    size: { h: 8.5, w: 11, uom: 'in' },
+    status: 'A'
+  },
+  {
+    item: 'paper',
+    qty: 100,
+    size: { h: 8.5, w: 11, uom: 'in' },
+    status: 'D'
+  },
+  {
+    item: 'planner',
+    qty: 75,
+    size: { h: 22.85, w: 30, uom: 'cm' },
+    status: 'D'
+  },
+  {
+    item: 'postcard',
+    qty: 45,
+    size: { h: 10, w: 15.25, uom: 'cm' },
+    status: 'A'
+  }
+]);
+
+
+# Understanding different query conditions
+1. This selects all the documents where "size.uom" is equal to "cm".
+db.collection('inventory').find({
+    "size.uom": "cm"
+})
+
+2. This selects all the documents where "size.h" is lesser than 15.
+db.collection('inventory').find({
+    "size.h": { $lt: 15 }
+})
+
+3. Specifying AND condition- This selects all the documents where the nested field h is lesser 
+lesser than 15, the nested field uom is equal to in, and the status field is equal to D.
+db.collection('inventory').find({
+  'size.h': { $lt: 15 },
+  'size.uom': 'in',
+  status: 'D'
+});
